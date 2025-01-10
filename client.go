@@ -88,22 +88,31 @@ type connectionCloser interface {
 //
 // If your use case involves multiple long-lived connections, consider using
 // the ClientManager, which manages clients for you.
-func NewClient(certificate tls.Certificate) *Client {
+func NewClient(certificate tls.Certificate, readIdleTimeout time.Duration, timeout time.Duration) *Client {
 	tlsConfig := &tls.Config{
 		Certificates: []tls.Certificate{certificate},
 	}
 	if len(certificate.Certificate) > 0 {
 		tlsConfig.BuildNameToCertificate()
 	}
+
+	if readIdleTimeout == 0 {
+		readIdleTimeout = ReadIdleTimeout
+	}
+
+	if timeout == 0 {
+		timeout = HTTPClientTimeout
+	}
+
 	transport := &http2.Transport{
 		TLSClientConfig: tlsConfig,
 		DialTLS:         DialTLS,
-		ReadIdleTimeout: ReadIdleTimeout,
+		ReadIdleTimeout: readIdleTimeout,
 	}
 	return &Client{
 		HTTPClient: &http.Client{
 			Transport: transport,
-			Timeout:   HTTPClientTimeout,
+			Timeout:   timeout,
 		},
 		Certificate: certificate,
 		Host:        DefaultHost,
@@ -140,8 +149,11 @@ func (c *Client) Development() *Client {
 }
 
 // Production sets the Client to use the APNs production push endpoint.
-func (c *Client) Production() *Client {
-	c.Host = HostProduction
+func (c *Client) Production(pushUrl string) *Client {
+	if pushUrl == "" {
+		pushUrl = HostProduction
+	}
+	c.Host = pushUrl
 	return c
 }
 
