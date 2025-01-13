@@ -31,7 +31,7 @@ var (
 	// HTTPClientTimeout specifies a time limit for requests made by the
 	// HTTPClient. The timeout includes connection time, any redirects,
 	// and reading the response body.
-	HTTPClientTimeout = 60 * time.Second
+	HTTPClientTimeout = 5 * time.Second
 
 	// ReadIdleTimeout is the timeout after which a health check using a ping
 	// frame will be carried out if no frame is received on the connection. If

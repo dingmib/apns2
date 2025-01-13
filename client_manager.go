@@ -29,7 +29,7 @@ type ClientManager struct {
 
 	// Factory is the function which constructs clients if not found in the
 	// manager.
-	Factory func(certificate tls.Certificate) *Client
+	Factory func(certificate tls.Certificate, readIdleTimeout time.Duration, timeout time.Duration) *Client
 
 	cache map[[sha1.Size]byte]*list.Element
 	ll    *list.List
@@ -97,7 +97,7 @@ func (m *ClientManager) Get(certificate tls.Certificate) *Client {
 	if ele, hit := m.cache[key]; hit {
 		item := ele.Value.(*managerItem)
 		if m.MaxAge != 0 && item.lastUsed.Before(now.Add(-m.MaxAge)) {
-			c := m.Factory(certificate)
+			c := m.Factory(certificate, 0, 0)
 			if c == nil {
 				return nil
 			}
@@ -108,7 +108,7 @@ func (m *ClientManager) Get(certificate tls.Certificate) *Client {
 		return item.client
 	}
 
-	c := m.Factory(certificate)
+	c := m.Factory(certificate, 0, 0)
 	if c == nil {
 		return nil
 	}
