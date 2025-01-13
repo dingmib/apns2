@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	. "github.com/sideshow/apns2/payload"
+	. "github.com/dingmib/apns2/payload"
 	"github.com/stretchr/testify/assert"
 )
 

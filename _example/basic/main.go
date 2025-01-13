@@ -6,8 +6,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/sideshow/apns2"
-	"github.com/sideshow/apns2/certificate"
+	"github.com/dingmib/apns2"
+	"github.com/dingmib/apns2/certificate"
 )
 
 func main() {
