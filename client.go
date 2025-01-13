@@ -127,16 +127,23 @@ func NewClient(certificate tls.Certificate, readIdleTimeout time.Duration, timeo
 // so that you can keep your connections with APNs open across multiple
 // notifications; don’t repeatedly open and close connections. APNs treats rapid
 // connection and disconnection as a denial-of-service attack.
-func NewTokenClient(token *token.Token) *Client {
+func NewTokenClient(token *token.Token, readIdleTimeout time.Duration, timeout time.Duration) *Client {
+	if readIdleTimeout == 0 {
+		readIdleTimeout = ReadIdleTimeout
+	}
+
+	if timeout == 0 {
+		timeout = HTTPClientTimeout
+	}
 	transport := &http2.Transport{
 		DialTLS:         DialTLS,
-		ReadIdleTimeout: ReadIdleTimeout,
+		ReadIdleTimeout: readIdleTimeout,
 	}
 	return &Client{
 		Token: token,
 		HTTPClient: &http.Client{
 			Transport: transport,
-			Timeout:   HTTPClientTimeout,
+			Timeout:   timeout,
 		},
 		Host: DefaultHost,
 	}
